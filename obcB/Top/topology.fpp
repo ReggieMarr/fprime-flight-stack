@@ -4,7 +4,7 @@ module obcB {
   # Symbolic constants for port numbers
   # ----------------------------------------------------------------------
 
-    enum b_Ports_RateGroups {
+    enum Ports_RateGroups {
       rateGroup1
       rateGroup2
       rateGroup3
@@ -16,60 +16,60 @@ module obcB {
     # Instances used in the topology
     # ----------------------------------------------------------------------
 
-    instance b_health
-    instance b_blockDrv
-    instance b_tlmSend
-    instance b_cmdDisp
-    instance b_cmdSeq
-    instance b_comDriver
-    instance b_comQueue
-    instance b_comStub
-    instance b_deframer
-    instance b_eventLogger
-    instance b_fatalAdapter
-    instance b_fatalHandler
-    instance b_fileDownlink
-    instance b_fileManager
-    instance b_fileUplink
-    instance b_bufferManager
-    instance b_framer
-    instance b_posixTime
-    instance b_prmDb
-    instance b_rateGroup1
-    instance b_rateGroup2
-    instance b_rateGroup3
-    instance b_rateGroupDriver
-    instance b_textLogger
-    instance b_systemResources
+    instance $health
+    instance blockDrv
+    instance tlmSend
+    instance cmdDisp
+    instance cmdSeq
+    instance comDriver
+    instance comQueue
+    instance comStub
+    instance deframer
+    instance eventLogger
+    instance fatalAdapter
+    instance fatalHandler
+    instance fileDownlink
+    instance fileManager
+    instance fileUplink
+    instance bufferManager
+    instance framer
+    instance posixTime
+    instance prmDb
+    instance rateGroup1
+    instance rateGroup2
+    instance rateGroup3
+    instance rateGroupDriver
+    instance textLogger
+    instance systemResources
 
-    instance b_hub
-    instance b_hubComDriver
-    instance b_hubComStub
-    instance b_hubComQueue
-    instance b_hubDeframer
-    instance b_hubFramer
-    instance b_proxyGroundInterface
-    instance b_proxySequencer
+    instance hub
+    instance hubComDriver
+    instance hubComStub
+    instance hubComQueue
+    instance hubDeframer
+    instance hubFramer
+    instance proxyGroundInterface
+    instance proxySequencer
 
     # ----------------------------------------------------------------------
     # Pattern graph specifiers
     # ----------------------------------------------------------------------
 
-    command connections instance b_cmdDisp
+    command connections instance cmdDisp
 
-    # event connections instance b_eventLogger
-    event connections instance b_hub 
+    # event connections instance eventLogger
+    event connections instance hub
 
-    param connections instance b_prmDb
+    param connections instance prmDb
 
-    # telemetry connections instance b_tlmSend
-    telemetry connections instance b_hub
+    # telemetry connections instance tlmSend
+    telemetry connections instance hub
 
-    text event connections instance b_textLogger
+    text event connections instance textLogger
 
-    time connections instance b_posixTime
+    time connections instance posixTime
 
-    health connections instance b_health
+    health connections instance $health
 
     # ----------------------------------------------------------------------
     # Direct graph specifiers
@@ -77,71 +77,71 @@ module obcB {
 
     # connections Downlink {
 
-    #   b_eventLogger.PktSend -> b_comQueue.comQueueIn[0]
-    #   b_tlmSend.PktSend -> b_comQueue.comQueueIn[1]
-    #   b_fileDownlink.bufferSendOut -> b_comQueue.buffQueueIn[0]
+    #   eventLogger.PktSend -> comQueue.comQueueIn[0]
+    #   tlmSend.PktSend -> comQueue.comQueueIn[1]
+    #   fileDownlink.bufferSendOut -> comQueue.buffQueueIn[0]
 
-    #   b_comQueue.comQueueSend -> b_framer.comIn
-    #   b_comQueue.buffQueueSend -> b_framer.bufferIn
+    #   comQueue.comQueueSend -> framer.comIn
+    #   comQueue.buffQueueSend -> framer.bufferIn
 
-    #   b_framer.framedAllocate -> b_bufferManager.bufferGetCallee
-    #   b_framer.framedOut -> b_comStub.comDataIn
-    #   b_framer.bufferDeallocate -> b_fileDownlink.bufferReturn
+    #   framer.framedAllocate -> bufferManager.bufferGetCallee
+    #   framer.framedOut -> comStub.comDataIn
+    #   framer.bufferDeallocate -> fileDownlink.bufferReturn
 
-    #   b_comDriver.deallocate -> b_bufferManager.bufferSendIn
-    #   b_comDriver.ready -> b_comStub.drvConnected
+    #   comDriver.deallocate -> bufferManager.bufferSendIn
+    #   comDriver.ready -> comStub.drvConnected
 
-    #   b_comStub.comStatus -> b_framer.comStatusIn
-    #   b_framer.comStatusOut -> b_comQueue.comStatusIn
-    #   b_comStub.drvDataOut -> b_comDriver.$send
+    #   comStub.comStatus -> framer.comStatusIn
+    #   framer.comStatusOut -> comQueue.comStatusIn
+    #   comStub.drvDataOut -> comDriver.$send
 
     # }
 
     connections FaultProtection {
-      b_eventLogger.FatalAnnounce -> b_fatalHandler.FatalReceive
+      eventLogger.FatalAnnounce -> fatalHandler.FatalReceive
     }
 
     connections RateGroups {
       # Block driver
-      b_blockDrv.CycleOut -> b_rateGroupDriver.CycleIn
+      blockDrv.CycleOut -> rateGroupDriver.CycleIn
 
       # Rate group 1
-      b_rateGroupDriver.CycleOut[b_Ports_RateGroups.rateGroup1] -> b_rateGroup1.CycleIn
-      # b_rateGroup1.RateGroupMemberOut[0] -> b_tlmSend.Run
-      b_rateGroup1.RateGroupMemberOut[0] -> b_fileDownlink.Run
-      b_rateGroup1.RateGroupMemberOut[1] -> b_systemResources.run
+      rateGroupDriver.CycleOut[Ports_RateGroups.rateGroup1] -> rateGroup1.CycleIn
+      # rateGroup1.RateGroupMemberOut[0] -> tlmSend.Run
+      rateGroup1.RateGroupMemberOut[0] -> fileDownlink.Run
+      rateGroup1.RateGroupMemberOut[1] -> systemResources.run
 
       # Rate group 2
-      b_rateGroupDriver.CycleOut[b_Ports_RateGroups.rateGroup2] -> b_rateGroup2.CycleIn
-      # b_rateGroup2.RateGroupMemberOut[0] -> b_cmdSeq.schedIn
+      rateGroupDriver.CycleOut[Ports_RateGroups.rateGroup2] -> rateGroup2.CycleIn
+      # rateGroup2.RateGroupMemberOut[0] -> cmdSeq.schedIn
 
       # Rate group 3
-      b_rateGroupDriver.CycleOut[b_Ports_RateGroups.rateGroup3] -> b_rateGroup3.CycleIn
-      b_rateGroup3.RateGroupMemberOut[0] -> b_health.Run
-      b_rateGroup3.RateGroupMemberOut[1] -> b_blockDrv.Sched
-      b_rateGroup3.RateGroupMemberOut[2] -> b_bufferManager.schedIn
+      rateGroupDriver.CycleOut[Ports_RateGroups.rateGroup3] -> rateGroup3.CycleIn
+      rateGroup3.RateGroupMemberOut[0] -> $health.Run
+      rateGroup3.RateGroupMemberOut[1] -> blockDrv.Sched
+      rateGroup3.RateGroupMemberOut[2] -> bufferManager.schedIn
     }
 
     # connections Sequencer {
-    #   b_cmdSeq.comCmdOut -> b_cmdDisp.seqCmdBuff
-    #   b_cmdDisp.seqCmdStatus -> b_cmdSeq.cmdResponseIn
+    #   cmdSeq.comCmdOut -> cmdDisp.seqCmdBuff
+    #   cmdDisp.seqCmdStatus -> cmdSeq.cmdResponseIn
     # }
 
     # connections Uplink {
 
-    #   b_comDriver.allocate -> b_bufferManager.bufferGetCallee
-    #   b_comDriver.$recv -> b_comStub.drvDataIn
-    #   b_comStub.comDataOut -> b_deframer.framedIn
+    #   comDriver.allocate -> bufferManager.bufferGetCallee
+    #   comDriver.$recv -> comStub.drvDataIn
+    #   comStub.comDataOut -> deframer.framedIn
 
-    #   b_deframer.framedDeallocate -> b_bufferManager.bufferSendIn
-    #   b_deframer.comOut -> b_cmdDisp.seqCmdBuff
+    #   deframer.framedDeallocate -> bufferManager.bufferSendIn
+    #   deframer.comOut -> cmdDisp.seqCmdBuff
 
-    #   b_cmdDisp.seqCmdStatus -> b_deframer.cmdResponseIn
+    #   cmdDisp.seqCmdStatus -> deframer.cmdResponseIn
 
-    #   b_deframer.bufferAllocate -> b_bufferManager.bufferGetCallee
-    #   b_deframer.bufferOut -> b_fileUplink.bufferSendIn
-    #   b_deframer.bufferDeallocate -> b_bufferManager.bufferSendIn
-    #   b_fileUplink.bufferSendOut -> b_bufferManager.bufferSendIn
+    #   deframer.bufferAllocate -> bufferManager.bufferGetCallee
+    #   deframer.bufferOut -> fileUplink.bufferSendIn
+    #   deframer.bufferDeallocate -> bufferManager.bufferSendIn
+    #   fileUplink.bufferSendOut -> bufferManager.bufferSendIn
     # }
 
     connections obcB {
@@ -149,41 +149,41 @@ module obcB {
     }
 
     connections send_hub {
-      b_hub.dataOut -> b_hubFramer.bufferIn
-      b_hub.dataOutAllocate -> b_bufferManager.bufferGetCallee
+      hub.dataOut -> hubFramer.bufferIn
+      hub.dataOutAllocate -> bufferManager.bufferGetCallee
       
-      b_hubFramer.framedOut -> b_hubComDriver.$send
-      b_hubFramer.bufferDeallocate -> b_bufferManager.bufferSendIn
-      b_hubFramer.framedAllocate -> b_bufferManager.bufferGetCallee
+      hubFramer.framedOut -> hubComDriver.$send
+      hubFramer.bufferDeallocate -> bufferManager.bufferSendIn
+      hubFramer.framedAllocate -> bufferManager.bufferGetCallee
       
-      b_hubComDriver.deallocate -> b_bufferManager.bufferSendIn
+      hubComDriver.deallocate -> bufferManager.bufferSendIn
     }
 
     connections recv_hub {
-      b_hubComDriver.$recv -> b_hubDeframer.framedIn
-      b_hubComDriver.allocate -> b_bufferManager.bufferGetCallee
+      hubComDriver.$recv -> hubDeframer.framedIn
+      hubComDriver.allocate -> bufferManager.bufferGetCallee
 
-      b_hubDeframer.bufferOut -> b_hub.dataIn
-      b_hubDeframer.bufferAllocate -> b_bufferManager.bufferGetCallee
-      b_hubDeframer.framedDeallocate -> b_bufferManager.bufferSendIn
+      hubDeframer.bufferOut -> hub.dataIn
+      hubDeframer.bufferAllocate -> bufferManager.bufferGetCallee
+      hubDeframer.framedDeallocate -> bufferManager.bufferSendIn
 
-      b_hub.dataInDeallocate -> b_bufferManager.bufferSendIn
+      hub.dataInDeallocate -> bufferManager.bufferSendIn
     }
 
     connections hub {
-      b_hub.portOut[0] -> b_proxyGroundInterface.seqCmdBuf
-      b_hub.portOut[1] -> b_proxySequencer.seqCmdBuf
+      hub.portOut[0] -> proxyGroundInterface.seqCmdBuf
+      hub.portOut[1] -> proxySequencer.seqCmdBuf
 
-      b_proxyGroundInterface.comCmdOut -> b_cmdDisp.seqCmdBuff
-      b_proxySequencer.comCmdOut -> b_cmdDisp.seqCmdBuff
+      proxyGroundInterface.comCmdOut -> cmdDisp.seqCmdBuff
+      proxySequencer.comCmdOut -> cmdDisp.seqCmdBuff
       
-      b_cmdDisp.seqCmdStatus -> b_proxyGroundInterface.cmdResponseIn
-      b_cmdDisp.seqCmdStatus -> b_proxySequencer.cmdResponseIn
+      cmdDisp.seqCmdStatus -> proxyGroundInterface.cmdResponseIn
+      cmdDisp.seqCmdStatus -> proxySequencer.cmdResponseIn
 
-      b_proxyGroundInterface.seqCmdStatus -> b_hub.portIn[0]
-      b_proxySequencer.seqCmdStatus -> b_hub.portIn[1]
+      proxyGroundInterface.seqCmdStatus -> hub.portIn[0]
+      proxySequencer.seqCmdStatus -> hub.portIn[1]
 
-      b_hub.buffersOut -> b_bufferManager.bufferSendIn
+      hub.buffersOut -> bufferManager.bufferSendIn
     }
 
   }

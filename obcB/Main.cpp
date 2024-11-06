@@ -11,6 +11,14 @@
 #include <getopt.h>
 // Used for printf functions
 #include <cstdlib>
+// Used to get the Os::Console
+#include <Os/Os.hpp>
+#include <Os/Console.hpp>
+
+#include <cstdio>
+#include <cstring>
+#include <ctype.h>
+#include <cstdlib>
 
 /**
  * \brief print command line help message
@@ -20,8 +28,19 @@
  * @param app: name of application
  */
 void print_usage(const char* app) {
-    (void)printf("Usage: ./%s [options]\n-a\thostname/IP address\n-p\tport_number\n", app);
+    (void) printf("Usage: ./%s [options]\n"
+                  "-p, --persist\t\tstay up regardless of component failure\n"
+                  "-d, --downlink PORT\tset downlink port\n"
+                  "-u, --uplink PORT\tset uplink port\n"
+                  "-a, --address HOST\tset hostname/IP address\n"
+                  "-h, --help\t\tshow this help message\n", app);
 }
+
+enum {
+    EXIT_CODE_OK = 0,
+    EXIT_CODE_STARTUP_FAILURE,
+};
+static volatile int EXIT_RET = EXIT_CODE_OK;
 
 /**
  * \brief shutdown topology cycling on signal
@@ -46,35 +65,53 @@ static void signalHandler(int signum) {
  * @return: 0 on success, something else on failure
  */
 int main(int argc, char* argv[]) {
-    I32 option = 0;
-    CHAR* hostname = nullptr;
-    U16 port_number = 0;
+    U32 uplink_port = 0; // Invalid port number forced
+    U32 downlink_port = 0; // Invalid port number forced
+    I32 option;
+    char* hostname;
+    option = 0;
+    hostname = nullptr;
 
-    // Loop while reading the getopt supplied options
-    while ((option = getopt(argc, argv, "hp:a:")) != -1) {
-        switch (option) {
-            // Handle the -a argument for address/hostname
+    static struct option long_options[] = {
+        {"help", no_argument, 0, 'h'},
+        {"downlink", required_argument, 0, 'd'},
+        {"uplink", required_argument, 0, 'u'},
+        {"address", required_argument, 0, 'a'},
+        {0, 0, 0, 0}
+    };
+
+    int option_index = 0;
+    while ((option = getopt_long(argc, argv, "hd:u:a:p", long_options, &option_index)) != -1) {
+        switch(option) {
+            case 'h':
+                print_usage(argv[0]);
+                return 0;
+            case 'd':
+                downlink_port = static_cast<U32>(atoi(optarg));
+                break;
+            case 'u':
+                uplink_port = static_cast<U32>(atoi(optarg));
+                break;
             case 'a':
                 hostname = optarg;
                 break;
-            // Handle the -p port number argument
-            case 'p':
-                port_number = static_cast<U16>(atoi(optarg));
-                break;
-            // Cascade intended: help output
-            case 'h':
-            // Cascade intended: help output
             case '?':
-            // Default case: output help and exit
             default:
-                print_usage(argv[0]);
-                return (option == 'h') ? 0 : 1;
+                EXIT_RET = EXIT_CODE_STARTUP_FAILURE;
         }
     }
+
+    // Check if required variables are set
+    if (EXIT_RET != EXIT_CODE_OK || !hostname || uplink_port == 0 || downlink_port == 0) {
+        fprintf(stderr, "Missing required parameters. Please provide all required options.\n");
+        print_usage(argv[0]);
+        return EXIT_RET;
+    }
+
+    Os::Console::init();
+
     // Object for communicating state to the reference topology
-    obcB::TopologyState inputs;
-    inputs.hostname = hostname;
-    inputs.port = port_number;
+    obcB::TopologyState state(hostname, uplink_port, downlink_port);
 
     // Setup program shutdown via Ctrl-C
     signal(SIGINT, signalHandler);
@@ -82,9 +119,9 @@ int main(int argc, char* argv[]) {
     (void)printf("Hit Ctrl-C to quit\n");
 
     // Setup, cycle, and teardown topology
-    obcB::setupTopology(inputs);
-    obcB::startSimulatedCycle(Fw::Time(1, 0));  // Program loop cycling rate groups at 1Hz
-    obcB::teardownTopology(inputs);
+    obcB::setupTopology(state);
+    obcB::startSimulatedCycle(Fw::TimeInterval(1, 0));  // Program loop cycling rate groups at 1Hz
+    obcB::teardownTopology(state);
     (void)printf("Exiting...\n");
     return 0;
 }

@@ -6,10 +6,12 @@
 // Provides access to autocoded functions
 #include <obcB/Top/obcBTopologyAc.hpp>
 #include <obcB/Top/obcBPacketsAc.hpp>
+#include <obcB/Top/obcBTopologyDefs.hpp>
+#include <obcB/Top/obcBTopology.hpp>
 
 // Necessary project-specified types
 #include <Fw/Types/MallocAllocator.hpp>
-#include <Os/Log.hpp>
+#include <Os/Console.hpp>
 #include <Svc/FramingProtocol/FprimeProtocol.hpp>
 
 // Used for 1Hz synthetic cycling
@@ -19,7 +21,7 @@
 using namespace obcB;
 
 // Instantiate a system logger that will handle Fw::Logger::logMsg calls
-Os::Log logger;
+Os::Console logger;
 
 // The reference topology uses a malloc-based allocator for components that need to allocate memory during the
 // initialization phase.
@@ -62,23 +64,23 @@ enum TopologyConstants {
 };
 
 // Hub Constants
-const char* REMOTE_HUB_IP_ADDRESS = "192.168.11.2";
+const char* REMOTE_HUB_IP_ADDRESS = "192.168.0.76";
 const U32 REMOTE_HUB_PORT = 50500;
 
 // Ping entries are autocoded, however; this code is not properly exported. Thus, it is copied here.
 Svc::Health::PingEntry pingEntries[] = {
-    {PingEntries::b_blockDrv::WARN, PingEntries::b_blockDrv::FATAL, "b_blockDrv"},
-    {PingEntries::b_tlmSend::WARN, PingEntries::b_tlmSend::FATAL, "b_chanTlm"},
-    {PingEntries::b_cmdDisp::WARN, PingEntries::b_cmdDisp::FATAL, "b_cmdDisp"},
-    {PingEntries::b_cmdSeq::WARN, PingEntries::b_cmdSeq::FATAL, "b_cmdSeq"},
-    {PingEntries::b_eventLogger::WARN, PingEntries::b_eventLogger::FATAL, "b_eventLogger"},
-    {PingEntries::b_fileDownlink::WARN, PingEntries::b_fileDownlink::FATAL, "b_fileDownlink"},
-    {PingEntries::b_fileManager::WARN, PingEntries::b_fileManager::FATAL, "b_fileManager"},
-    {PingEntries::b_fileUplink::WARN, PingEntries::b_fileUplink::FATAL, "b_fileUplink"},
-    {PingEntries::b_prmDb::WARN, PingEntries::b_prmDb::FATAL, "b_prmDb"},
-    {PingEntries::b_rateGroup1::WARN, PingEntries::b_rateGroup1::FATAL, "b_rateGroup1"},
-    {PingEntries::b_rateGroup2::WARN, PingEntries::b_rateGroup2::FATAL, "b_rateGroup2"},
-    {PingEntries::b_rateGroup3::WARN, PingEntries::b_rateGroup3::FATAL, "b_rateGroup3"},
+    {PingEntries::obcB_blockDrv::WARN, PingEntries::obcB_blockDrv::FATAL, "blockDrv"},
+    {PingEntries::obcB_tlmSend::WARN, PingEntries::obcB_tlmSend::FATAL, "chanTlm"},
+    {PingEntries::obcB_cmdDisp::WARN, PingEntries::obcB_cmdDisp::FATAL, "cmdDisp"},
+    {PingEntries::obcB_cmdSeq::WARN, PingEntries::obcB_cmdSeq::FATAL, "cmdSeq"},
+    {PingEntries::obcB_eventLogger::WARN, PingEntries::obcB_eventLogger::FATAL, "eventLogger"},
+    {PingEntries::obcB_fileDownlink::WARN, PingEntries::obcB_fileDownlink::FATAL, "fileDownlink"},
+    {PingEntries::obcB_fileManager::WARN, PingEntries::obcB_fileManager::FATAL, "fileManager"},
+    {PingEntries::obcB_fileUplink::WARN, PingEntries::obcB_fileUplink::FATAL, "fileUplink"},
+    {PingEntries::obcB_prmDb::WARN, PingEntries::obcB_prmDb::FATAL, "prmDb"},
+    {PingEntries::obcB_rateGroup1::WARN, PingEntries::obcB_rateGroup1::FATAL, "rateGroup1"},
+    {PingEntries::obcB_rateGroup2::WARN, PingEntries::obcB_rateGroup2::FATAL, "rateGroup2"},
+    {PingEntries::obcB_rateGroup3::WARN, PingEntries::obcB_rateGroup3::FATAL, "rateGroup3"},
 };
 
 /**
@@ -98,35 +100,35 @@ void configureTopology() {
     upBuffMgrBins.bins[1].numBuffers = DEFRAMER_BUFFER_COUNT;
     upBuffMgrBins.bins[2].bufferSize = COM_DRIVER_BUFFER_SIZE;
     upBuffMgrBins.bins[2].numBuffers = COM_DRIVER_BUFFER_COUNT;
-    b_bufferManager.setup(BUFFER_MANAGER_ID, 0, mallocator, upBuffMgrBins);
+    bufferManager.setup(BUFFER_MANAGER_ID, 0, mallocator, upBuffMgrBins);
     
     // Framer and Deframer components need to be passed a protocol handler
-    b_framer.setup(framing);
-    b_deframer.setup(deframing);
-    b_hubFramer.setup(hubFraming);
-    b_hubDeframer.setup(hubDeframing);
+    framer.setup(framing);
+    deframer.setup(deframing);
+    hubFramer.setup(hubFraming);
+    hubDeframer.setup(hubDeframing);
 
     // Command sequencer needs to allocate memory to hold contents of command sequences
-    // b_cmdSeq.allocateBuffer(0, mallocator, CMD_SEQ_BUFFER_SIZE);
+    // cmdSeq.allocateBuffer(0, mallocator, CMD_SEQ_BUFFER_SIZE);
 
     // Rate group driver needs a divisor list
-    b_rateGroupDriver.configure(rateGroupDivisorsSet);
+    rateGroupDriver.configure(rateGroupDivisorsSet);
 
     // Rate groups require context arrays.
-    b_rateGroup1.configure(rateGroup1Context, FW_NUM_ARRAY_ELEMENTS(rateGroup1Context));
-    b_rateGroup2.configure(rateGroup2Context, FW_NUM_ARRAY_ELEMENTS(rateGroup2Context));
-    b_rateGroup3.configure(rateGroup3Context, FW_NUM_ARRAY_ELEMENTS(rateGroup3Context));
+    rateGroup1.configure(rateGroup1Context, FW_NUM_ARRAY_ELEMENTS(rateGroup1Context));
+    rateGroup2.configure(rateGroup2Context, FW_NUM_ARRAY_ELEMENTS(rateGroup2Context));
+    rateGroup3.configure(rateGroup3Context, FW_NUM_ARRAY_ELEMENTS(rateGroup3Context));
 
     // File downlink requires some project-derived properties.
-    b_fileDownlink.configure(FILE_DOWNLINK_TIMEOUT, FILE_DOWNLINK_COOLDOWN, FILE_DOWNLINK_CYCLE_TIME,
+    fileDownlink.configure(FILE_DOWNLINK_TIMEOUT, FILE_DOWNLINK_COOLDOWN, FILE_DOWNLINK_CYCLE_TIME,
                            FILE_DOWNLINK_FILE_QUEUE_DEPTH);
 
     // Parameter database is configured with a database file name, and that file must be initially read.
-    b_prmDb.configure("PrmDb.dat");
-    b_prmDb.readParamFile();
+    prmDb.configure("PrmDb.dat");
+    prmDb.readParamFile();
 
     // Health is supplied a set of ping entires.
-    b_health.setPingEntries(pingEntries, FW_NUM_ARRAY_ELEMENTS(pingEntries), HEALTH_WATCHDOG_CODE);
+    health.setPingEntries(pingEntries, FW_NUM_ARRAY_ELEMENTS(pingEntries), HEALTH_WATCHDOG_CODE);
 
     // Note: Uncomment when using Svc:TlmPacketizer
     // tlmSend.setPacketList(obcBPacketsPkts, obcBPacketsIgnore, 1);
@@ -138,52 +140,40 @@ void configureTopology() {
     // File Downlink
     configurationTable.entries[2] = {.depth = 100, .priority = 1};
     // Allocation identifier is 0 as the MallocAllocator discards it
-    b_comQueue.configure(configurationTable, 0, mallocator);
-    b_hubComQueue.configure(configurationTable, 0, mallocator);
+    comQueue.configure(configurationTable, 0, mallocator);
+    hubComQueue.configure(configurationTable, 0, mallocator);
 }
 
 // Public functions for use in main program are namespaced with deployment name obcB
 namespace obcB {
 void setupTopology(const TopologyState& state) {
-    // Autocoded initialization. Function provided by autocoder.
-    initComponents(state);
-    // Autocoded id setup. Function provided by autocoder.
-    setBaseIds();
-    // Autocoded connection wiring. Function provided by autocoder.
-    connectComponents();
-    // Project-specific component configuration. Function provided above. May be inlined, if desired.
     configureTopology();
-    // Autocoded parameter loading. Function provided by autocoder.
-    // loadParameters();
-    // Autocoded command registration. Function provided by autocoder.
-    regCommands();
-    // Autocoded task kick-off (active components). Function provided by autocoder.
-    startTasks(state);
+    setup(state);
     // Initialize socket communication if and only if there is a valid specification
-    if (state.hostname != nullptr && state.port != 0) {
+    if (state.hostName != nullptr && state.uplinkPort != 0) {
         Os::TaskString name("ReceiveTask");
         // Uplink is configured for receive so a socket task is started
-        b_comDriver.configure(state.hostname, state.port);
-        b_comDriver.start(name, true, COMM_PRIORITY, Default::STACK_SIZE);
+        comDriver.configure(state.hostName, state.uplinkPort);
+        comDriver.start(name, true, COMM_PRIORITY, Default::STACK_SIZE);
     }
 
-    b_hubComDriver.configure(REMOTE_HUB_IP_ADDRESS, REMOTE_HUB_PORT);
+    hubComDriver.configure(REMOTE_HUB_IP_ADDRESS, REMOTE_HUB_PORT);
     Os::TaskString hubName("hub");
-    b_hubComDriver.start(hubName, true, COMM_PRIORITY, Default::STACK_SIZE);
+    hubComDriver.start(hubName, true, COMM_PRIORITY, Default::STACK_SIZE);
 }
 
 // Variables used for cycle simulation
 Os::Mutex cycleLock;
 volatile bool cycleFlag = true;
 
-void startSimulatedCycle(Fw::Time interval) {
+void startSimulatedCycle(Fw::TimeInterval interval) {
     cycleLock.lock();
     bool cycling = cycleFlag;
     cycleLock.unLock();
 
     // Main loop
     while (cycling) {
-        obcB::b_blockDrv.callIsr();
+        obcB::blockDrv.callIsr();
         Os::Task::delay(interval);
 
         cycleLock.lock();
@@ -204,13 +194,13 @@ void teardownTopology(const TopologyState& state) {
     freeThreads(state);
 
     // Other task clean-up.
-    b_comDriver.stop();
-    (void)b_comDriver.join();
-    b_hubComDriver.stop();
-    (void)b_hubComDriver.join();
+    comDriver.stop();
+    (void)comDriver.join();
+    hubComDriver.stop();
+    (void)hubComDriver.join();
 
     // Resource deallocation
-    b_cmdSeq.deallocateBuffer(mallocator);
-    b_bufferManager.cleanup();
+    cmdSeq.deallocateBuffer(mallocator);
+    bufferManager.cleanup();
 }
 };  // namespace obcB

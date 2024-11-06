@@ -14,6 +14,12 @@
 
 // Definitions are placed within a namespace named after the deployment
 namespace obcB {
+  namespace Allocation {
+
+    // Malloc allocator for topology construction
+    extern Fw::MallocAllocator mallocator;
+
+  }
 
 /**
  * \brief required type definition to carry state
@@ -23,8 +29,28 @@ namespace obcB {
  * to the definition of the project. Here, they are derived from command line inputs.
  */
 struct TopologyState {
-    const CHAR* hostname;
-    U16 port;
+TopologyState() :
+    //Should set defaults here
+    hostName(""),
+    uplinkPort(0),
+    downlinkPort(0)
+{
+
+}
+TopologyState(
+    const char *hostName,
+                U32 uplinkPort,
+                U32 downlinkPort
+) :
+    hostName(hostName),
+    uplinkPort(uplinkPort),
+    downlinkPort(downlinkPort)
+{
+
+}
+const char* hostName;
+U32 uplinkPort;
+U32 downlinkPort;
 };
 
 /**
@@ -47,40 +73,40 @@ struct TopologyState {
  * ```
  */
 namespace PingEntries {
-namespace b_blockDrv {
+namespace obcB_blockDrv {
 enum { WARN = 3, FATAL = 5 };
 }
-namespace b_tlmSend {
+namespace obcB_tlmSend {
 enum { WARN = 3, FATAL = 5 };
 }
-namespace b_cmdDisp {
+namespace obcB_cmdDisp {
 enum { WARN = 3, FATAL = 5 };
 }
-namespace b_cmdSeq {
+namespace obcB_cmdSeq {
 enum { WARN = 3, FATAL = 5 };
 }
-namespace b_eventLogger {
+namespace obcB_eventLogger {
 enum { WARN = 3, FATAL = 5 };
 }
-namespace b_fileDownlink {
+namespace obcB_fileDownlink {
 enum { WARN = 3, FATAL = 5 };
 }
-namespace b_fileManager {
+namespace obcB_fileManager {
 enum { WARN = 3, FATAL = 5 };
 }
-namespace b_fileUplink {
+namespace obcB_fileUplink {
 enum { WARN = 3, FATAL = 5 };
 }
-namespace b_prmDb {
+namespace obcB_prmDb {
 enum { WARN = 3, FATAL = 5 };
 }
-namespace b_rateGroup1 {
+namespace obcB_rateGroup1 {
 enum { WARN = 3, FATAL = 5 };
 }
-namespace b_rateGroup2 {
+namespace obcB_rateGroup2 {
 enum { WARN = 3, FATAL = 5 };
 }
-namespace b_rateGroup3 {
+namespace obcB_rateGroup3 {
 enum { WARN = 3, FATAL = 5 };
 }
 }  // namespace PingEntries

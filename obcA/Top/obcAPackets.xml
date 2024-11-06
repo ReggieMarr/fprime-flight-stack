@@ -3,89 +3,84 @@
     <import_topology>obcA/Top/obcATopologyAppAi.xml</import_topology>
 
     <packet name="CDH" id="1" level="1">
-        <channel name="a_cmdDisp.CommandsDispatched"/>
-        <channel name="a_rateGroup1.RgMaxTime"/>
-        <channel name="a_rateGroup2.RgMaxTime"/>
-        <channel name="a_rateGroup3.RgMaxTime"/>
-        <channel name="a_cmdSeq.CS_LoadCommands"/>
-        <channel name="a_cmdSeq.CS_CancelCommands"/>
-        <channel name="a_cmdSeq.CS_CommandsExecuted"/>
-        <channel name="a_cmdSeq.CS_SequencesCompleted"/>
-        <channel name="a_fileUplink.FilesReceived"/>
-        <channel name="a_fileUplink.PacketsReceived"/>
-        <channel name="a_bufferManager.TotalBuffs"/>
-        <channel name="a_bufferManager.CurrBuffs"/>
-        <channel name="a_bufferManager.HiBuffs"/>
-        <channel name="a_fileDownlink.FilesSent"/>
-        <channel name="a_fileDownlink.PacketsSent"/>
-        <channel name="a_fileManager.CommandsExecuted"/>
+        <channel name="cmdDisp.CommandsDispatched"/>
+        <channel name="rateGroup1.RgMaxTime"/>
+        <channel name="rateGroup2.RgMaxTime"/>
+        <channel name="rateGroup3.RgMaxTime"/>
+        <channel name="cmdSeq.CS_LoadCommands"/>
+        <channel name="cmdSeq.CS_CancelCommands"/>
+        <channel name="cmdSeq.CS_CommandsExecuted"/>
+        <channel name="cmdSeq.CS_SequencesCompleted"/>
+        <channel name="fileUplink.FilesReceived"/>
+        <channel name="fileUplink.PacketsReceived"/>
+        <channel name="bufferManager.TotalBuffs"/>
+        <channel name="bufferManager.CurrBuffs"/>
+        <channel name="bufferManager.HiBuffs"/>
+        <channel name="fileDownlink.FilesSent"/>
+        <channel name="fileDownlink.PacketsSent"/>
+        <channel name="fileManager.CommandsExecuted"/>
         <!-- Uncomment to use Svc::TlmPacketizer -->
-        <!--channel name="a_tlmSend.SendLevel"/-->
+        <!--channel name="tlmSend.SendLevel"/-->
     </packet>
 
     <packet name="CDHErrors" id="2" level="1">
-        <channel name="a_rateGroup1.RgCycleSlips"/>
-        <channel name="a_rateGroup2.RgCycleSlips"/>
-        <channel name="a_rateGroup3.RgCycleSlips"/>
-        <channel name="a_cmdSeq.CS_Errors"/>
-        <channel name="a_fileUplink.Warnings"/>
-        <channel name="a_fileDownlink.Warnings"/>
-        <channel name="a_health.PingLateWarnings"/>
-        <channel name="a_fileManager.Errors"/>
-        <channel name="a_bufferManager.NoBuffs"/>
-        <channel name="a_bufferManager.EmptyBuffs"/>
-        <channel name="a_fileManager.Errors"/>
+        <channel name="rateGroup1.RgCycleSlips"/>
+        <channel name="rateGroup2.RgCycleSlips"/>
+        <channel name="rateGroup3.RgCycleSlips"/>
+        <channel name="cmdSeq.CS_Errors"/>
+        <channel name="fileUplink.Warnings"/>
+        <channel name="fileDownlink.Warnings"/>
+        <channel name="health.PingLateWarnings"/>
+        <channel name="fileManager.Errors"/>
+        <channel name="bufferManager.NoBuffs"/>
+        <channel name="bufferManager.EmptyBuffs"/>
+        <channel name="fileManager.Errors"/>
     </packet>
 
     <packet name="DriveTlm" id="3" level="1">
-        <channel name="a_blockDrv.BD_Cycles"/>
+        <channel name="blockDrv.BD_Cycles"/>
     </packet>
 
     <packet name="Comms" id="4" level="1">
-        <channel name="a_comQueue.comQueueDepth"/>
-        <channel name="a_comQueue.buffQueueDepth"/>
+        <channel name="comQueue.comQueueDepth"/>
+        <channel name="comQueue.buffQueueDepth"/>
     </packet>
 
     <packet name="SystemRes1" id="5" level="2">
-        <channel name="a_systemResources.MEMORY_TOTAL"/>
-        <channel name="a_systemResources.MEMORY_USED"/>
-        <channel name="a_systemResources.NON_VOLATILE_TOTAL"/>
-        <channel name="a_systemResources.NON_VOLATILE_FREE"/>
+        <channel name="systemResources.MEMORY_TOTAL"/>
+        <channel name="systemResources.MEMORY_USED"/>
+        <channel name="systemResources.NON_VOLATILE_TOTAL"/>
+        <channel name="systemResources.NON_VOLATILE_FREE"/>
     </packet>
 
-    <packet name="SystemRes2" id="6" level="2">
-        <channel name="a_systemResources.FRAMEWORK_VERSION"/>
-        <channel name="a_systemResources.PROJECT_VERSION"/>
+    <packet name="SystemRes3" id="6" level="2">
+        <channel name="systemResources.CPU"/>
+        <channel name="systemResources.CPU_00"/>
+        <channel name="systemResources.CPU_01"/>
+        <channel name="systemResources.CPU_02"/>
+        <channel name="systemResources.CPU_03"/>
+        <channel name="systemResources.CPU_04"/>
+        <channel name="systemResources.CPU_05"/>
+        <channel name="systemResources.CPU_06"/>
+        <channel name="systemResources.CPU_07"/>
+        <channel name="systemResources.CPU_08"/>
+        <channel name="systemResources.CPU_09"/>
+        <channel name="systemResources.CPU_10"/>
+        <channel name="systemResources.CPU_11"/>
+        <channel name="systemResources.CPU_12"/>
+        <channel name="systemResources.CPU_13"/>
+        <channel name="systemResources.CPU_14"/>
+        <channel name="systemResources.CPU_15"/>
     </packet>
 
-    <packet name="SystemRes3" id="7" level="2">
-        <channel name="a_systemResources.CPU"/>
-        <channel name="a_systemResources.CPU_00"/>
-        <channel name="a_systemResources.CPU_01"/>
-        <channel name="a_systemResources.CPU_02"/>
-        <channel name="a_systemResources.CPU_03"/>
-        <channel name="a_systemResources.CPU_04"/>
-        <channel name="a_systemResources.CPU_05"/>
-        <channel name="a_systemResources.CPU_06"/>
-        <channel name="a_systemResources.CPU_07"/>
-        <channel name="a_systemResources.CPU_08"/>
-        <channel name="a_systemResources.CPU_09"/>
-        <channel name="a_systemResources.CPU_10"/>
-        <channel name="a_systemResources.CPU_11"/>
-        <channel name="a_systemResources.CPU_12"/>
-        <channel name="a_systemResources.CPU_13"/>
-        <channel name="a_systemResources.CPU_14"/>
-        <channel name="a_systemResources.CPU_15"/>
-    </packet>
-
-    <packet name="HubComms" id="8" level="1">
-        <channel name="a_hubComQueue.comQueueDepth"/>
-        <channel name="a_hubComQueue.buffQueueDepth"/>
+    <packet name="HubComms" id="7" level="1">
+        <channel name="hubComQueue.comQueueDepth"/>
+        <channel name="hubComQueue.buffQueueDepth"/>
     </packet>
     
     <!-- Ignored packets -->
 
     <ignore>
-        <channel name="a_cmdDisp.CommandErrors"/>
+        <channel name="cmdDisp.CommandErrors"/>
     </ignore>
 </packets>
