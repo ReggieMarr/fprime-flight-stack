@@ -174,12 +174,12 @@ case $1 in
         # check_port ${UPLINK_TARGET_PORT}
 
         # NOTE this is one of those cases that redo might handle better
-        run_docker_compose "fsw bash -c \"cd ./GDSDictionary/ && ./gendictionary.sh\""
+        # run_docker_compose "fsw bash -c \"cd ./GDSDictionary/ && ./gendictionary.sh\""
 
         DICT_PATH=${DICT_PATH:-"./GDSDictionary/GDSDictionaryTopologyDictionary.json"}
         FLAGS+=" --dictionary ${DICT_PATH}"
         FLAGS+=" --no-app"
-        FLAGS+=" --ip-port=${UPLINK_TARGET_PORT} --tts-port=${DOWNLINK_TARGET_PORT}"
+        FLAGS+=" --ip-client --ip-port=${UPLINK_TARGET_PORT} --tts-port=${DOWNLINK_TARGET_PORT}"
 
         GDS_CMD="fprime-gds ${FLAGS}"
         run_docker_compose "fsw bash -c \"$GDS_CMD\""
